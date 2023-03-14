@@ -4,17 +4,19 @@ library("dplyr")
 library("tidyverse")
 library("writexl")
 library("janitor")
-#library("rJava")
-#system("java -version")
+library("rJava")
+system("java -version")
+
 # Defina o seu projeto no Google Cloud
 set_billing_id("basedosdados-379114")
 
+# Visualização do dicionário da base
 query <- bdplyr("br_me_rais.dicionario")
 dic <- bd_collect(query)
 View(dic)
 
 
-# Para carregar o dado direto no R
+# Para carregar o dado direto no R filtrando por ano 2021 e município de São Paulo
 query <- bdplyr("br_me_rais.microdados_vinculos") %>% 
   filter(ano == 2021,
          id_municipio == "3550308") %>% 
@@ -43,9 +45,6 @@ query <- bdplyr("br_me_rais.microdados_vinculos") %>%
   
 tabela <- bd_collect(query)
 
-query <- bdplyr("br_me_caged.dicionario")
-dic_caged <- bd_collect(query)
-View(dic_caged)
 # Importando dataset de População em Idade Ativa 
 
 
@@ -188,8 +187,7 @@ labelsFaixa = c("0 a 18", "18 a 24", "25 a 29", "30 a 34", "35 a 39", "40 a 44",
 df<- df %>%
   mutate(faixa_smads = cut(df$idade, breaks = breaksFaixa, labels = labelsFaixa))
 
-
-    # Tabela dinâmica de vínculos por faixa etária
+# Tabela dinâmica de vínculos por faixa etária
 vinculos_faixaEtaria = df %>%
   filter(vinculo_ativo_3112 == 1) %>% 
   group_by(distritos_sp, faixa_smads) %>% 
@@ -200,6 +198,6 @@ vinculos_faixaEtaria = df %>%
 
 View(vinculos_faixaEtaria)
 
+# Extraindo tabelas para arquivo excel
 write_xlsx(list(Renda = vinculos_distrito, Raça = vinculos_raca, Faixa_Etária = vinculos_faixaEtaria), "rais_vazios2.xlsx")
 
-View(df)
